@@ -45,6 +45,7 @@ void UPUBGPlayerGA_Jump::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	if ((Direction != EPUBGDirection::None && Direction != EPUBGDirection::Forward) || CharacterMovement->IsFalling())
 	{
 		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
+		return;
 	}
 
 	if (CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo) == false)
@@ -58,7 +59,17 @@ void UPUBGPlayerGA_Jump::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	{
 		Server_RequestJump();
 		StartJump();
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+		//EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	}
+}
+
+void UPUBGPlayerGA_Jump::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+
+	if (APUBGPlayerCharacter* PlayerCharacter = GetPlayerCharacterFromActorInfo())
+	{
+		PlayerCharacter->LandedDelegate.RemoveDynamic(this, &ThisClass::OnLandedCallback);
 	}
 }
 
@@ -66,17 +77,23 @@ void UPUBGPlayerGA_Jump::Server_RequestJump_Implementation()
 {
 	CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
 	StartJump();
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	//EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
 void UPUBGPlayerGA_Jump::StartJump()
 {
 	if (APUBGPlayerCharacter* PlayerCharacter = GetPlayerCharacterFromActorInfo())
 	{
+		PlayerCharacter->LandedDelegate.AddDynamic(this, &ThisClass::OnLandedCallback);
 		if (PlayerCharacter->IsLocallyControlled() && PlayerCharacter->bPressedJump == false)
 		{
 			PlayerCharacter->UnCrouch();
 			PlayerCharacter->Jump();
 		}
 	}
+}
+
+void UPUBGPlayerGA_Jump::OnLandedCallback(const FHitResult& Hit)
+{
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }

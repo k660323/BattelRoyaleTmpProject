@@ -19,6 +19,7 @@ namespace PUBGGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Walk, "Input.Walk");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Sprint, "Input.Sprint");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Interact, "Input.Interact");
+	UE_DEFINE_GAMEPLAY_TAG(Input_FPS, "Input.FPS");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Input_Active_EquipmentMain, "Input.Active.EquipmentMain");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Active_EquipmentMain2, "Input.Active.EquipmentMain2");
@@ -43,7 +44,9 @@ namespace PUBGGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_AimOffset_MainGun, "Status.AimOffset.MainGun");
 	UE_DEFINE_GAMEPLAY_TAG(Status_AimOffset_SubGun, "Status.AimOffset.SubGun");
 	UE_DEFINE_GAMEPLAY_TAG(Status_AimOffset_Throw, "Status.AimOffset.Throw");
-	UE_DEFINE_GAMEPLAY_TAG(Status_Aim, "Status.Aim");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Aiming, "Status.Aiming");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Aim_Scope, "Status.Aim.Scope");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Aim_ADS, "Status.Aim.ADS");
 	UE_DEFINE_GAMEPLAY_TAG(Status_FreeFalling, "Status.FreeFalling");
 	UE_DEFINE_GAMEPLAY_TAG(Status_UmbrellaOpened, "Status.UmbrellaOpened");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Drink, "Status.Drink");
@@ -51,6 +54,7 @@ namespace PUBGGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_Interact, "Status.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Weapon_Switching, "Status.Weapon.Switching");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Attack, "Status.Attack");
+	UE_DEFINE_GAMEPLAY_TAG(Status_FPS, "Status.FPS");
 	//UE_DEFINE_GAMEPLAY_TAG(Status_HandItem_AK47, "Status.HandItem.AK47");
 
 	// Ability
@@ -78,7 +82,10 @@ namespace PUBGGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_1, "Ability.Attack.1");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_2, "Ability.Attack.2");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack_3, "Ability.Attack.3");
-	
+	UE_DEFINE_GAMEPLAY_TAG(Ability_AimDownSightMode, "Ability.AimDownSightMode");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_ScopeMode, "Ability.ScopeMode");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_FPS, "Ability.FPS");
+
 	// Weapon
 	UE_DEFINE_GAMEPLAY_TAG(Weapon_Suppressor, "Weapon.Suppressor");
 	UE_DEFINE_GAMEPLAY_TAG(Weapon_NotFlash, "Weapon.NotFlash");
@@ -103,6 +110,8 @@ namespace PUBGGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Tick, "GameplayEvent.Montage.Tick");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_End, "GameplayEvent.Montage.End");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_Montage_Play, "GameplayEvent.Montage.Play");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_AimDownSightMode, "GameplayEvent.AimDownSightMode");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayEvent_ScopeMode, "GameplayEvent.ScopeMode");
 
 	// Cheat
 	UE_DEFINE_GAMEPLAY_TAG(Cheat_GodMode, "Cheat.GodMode");

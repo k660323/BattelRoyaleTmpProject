@@ -5,6 +5,7 @@
 #include "AbilitySystem/Abilities/PUBGPlayerGameplayAbility.h"
 #include "PUBGPlayerGA_Sprint.generated.h"
 
+class UInputAction;
 /**
  * 
  */

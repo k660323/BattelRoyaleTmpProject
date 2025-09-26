@@ -18,11 +18,20 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<APUBGEquipmentBase> SpawnWeaponClass;
 
-	UPROPERTY(EditDefaultsOnly, EditFixedSize)
+	UPROPERTY(EditDefaultsOnly, EditFixedSize, Category = "PUBG|TPS")
 	TMap<FGameplayTag, FName> AttachSocketMap;
 
-	UPROPERTY(EditDefaultsOnly)
-	FTransform AttachTransformOffset;
+	UPROPERTY(EditDefaultsOnly, Category = "PUBG|TPS")
+	FTransform AttachRelativeTransform;
+
+	UPROPERTY(EditDefaultsOnly, EditFixedSize, Category = "PUBG|FPS")
+	FName AttachSocketFPS;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PUBG|FPS")
+	FTransform AttachRelativeTransformFPS;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PUBG|FPS")
+	FTransform AttachRelativeTransformFPSArm;
 };
 
 /**

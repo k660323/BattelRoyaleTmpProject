@@ -5,7 +5,7 @@
 #include "Item/Managers/PUBGEquipmentManagerComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "AbilitySystemGlobals.h"
-#include "Characters/PUBGBaseCharacter.h"
+#include "Characters/PUBGPlayerCharacter.h"
 #include "Item/Fragments/PUBGItemFragment_Equipable.h"
 #include "Item/Fragments/PUBGItemFragment_Weapon.h"
 #include "Item/Fragments/PUBGItemFragment_Fashion.h"
@@ -132,6 +132,8 @@ void FPUBGActiveEquipmentEntry::Equip()
 			}
 		}
 	}
+
+	ActiveEquipmentManager->SetWeaponEquipmentSocketToWeaponActiveEquipmentSocket(EquipmentSlotType);
 }
 
 void FPUBGActiveEquipmentEntry::Unequip()
@@ -194,6 +196,11 @@ void FPUBGActiveEquipmentEntry::Unequip()
 				}
 			}
 		}
+	}
+
+	if (UPUBGEquipmentManagerComponent* EquipmentManager = ActiveEquipmentManager->GetEquipmentManager())
+	{
+		EquipmentManager->SetWeaponActiveEquipmentSocketToWeaponEquipmentSocket(EquipmentSlotType);
 	}
 }
 
@@ -408,9 +415,6 @@ void UPUBGActiveEquipmentManagerComponent::EquipCurrentSlots()
 	{
 		EEquipmentSlotType EquipmentSlotType = ActiveWeaponEquipmentTypeConvertToEquipmentSlotType(CurActiveWeaponEquipmentType);
 		Equip(EquipmentSlotType, EquipmentManager->GetItemInstance(EquipmentSlotType));
-
-		// 손잡이에 장착
-		SetWeaponEquipmentSocketToWeaponActiveEquipmentSocket(EquipmentSlotType);
 	}
 }
 
@@ -425,11 +429,6 @@ void UPUBGActiveEquipmentManagerComponent::UnequipCurrentSlots()
 
 	EEquipmentSlotType EquipmentSlotType = ActiveWeaponEquipmentTypeConvertToEquipmentSlotType(CurActiveWeaponEquipmentType);
 	Unequip(EquipmentSlotType);
-
-	if (UPUBGEquipmentManagerComponent* EquipmentManager = GetEquipmentManager())
-	{
-		EquipmentManager->SetWeaponActiveEquipmentSocketToWeaponEquipmentSocket(EquipmentSlotType);
-	}
 }
 
 void UPUBGActiveEquipmentManagerComponent::ChangeEquipState(EActiveWeaponEquipmentType NewActiveEquipmentState)
@@ -640,12 +639,6 @@ void UPUBGActiveEquipmentManagerComponent::SetWeaponEquipmentSocketToWeaponActiv
 			return;
 		}
 
-		USkeletalMeshComponent* MeshComponent = Character->GetMesh();
-		if (MeshComponent == nullptr)
-		{
-			return;
-		}
-
 		FPUBGEquipmentEntry& Entry = EquipmentManager->GetEntry(EquipmentSlotType);
 		UPUBGItemInstance* ItemInstance = Entry.GetItemInstance();
 		if (ItemInstance == nullptr)
@@ -658,12 +651,29 @@ void UPUBGActiveEquipmentManagerComponent::SetWeaponEquipmentSocketToWeaponActiv
 
 		if (SpawnWeaponActor && AttachmentFragment)
 		{
-			FName AttachSocket = AttachmentFragment->GetActiveEquipmentAttachSocket(ASC);
-			FTransform NewTransform = MeshComponent->GetSocketTransform(AttachSocket);
-			SpawnWeaponActor->SetActorTransform(NewTransform);
 			FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
-			SpawnWeaponActor->AttachToComponent(MeshComponent, AttachmentTransformRules, AttachSocket);
-			SpawnWeaponActor->SetActorRelativeTransform(AttachmentFragment->AttachInfo.AttachTransformOffset);
+			
+			if (GetOwner()->HasAuthority())
+			{
+				FName AttachSocket = AttachmentFragment->GetActiveEquipmentAttachSocket(ASC);
+				FTransform NewTransform = Character->GetMesh()->GetSocketTransform(AttachSocket);
+				SpawnWeaponActor->SetActorTransform(NewTransform);
+				SpawnWeaponActor->AttachToComponent(Character->GetMesh(), AttachmentTransformRules, AttachSocket);
+				SpawnWeaponActor->SetActorRelativeTransform(AttachmentFragment->AttachInfo.AttachRelativeTransform);
+				SpawnWeaponActor->GetFPSEquipmentMesh()->SetVisibility(false);
+			}
+		
+			// 1인칭 매쉬
+			if (APUBGPlayerCharacter* PlayerCharacter = Cast<APUBGPlayerCharacter>(Character))
+			{
+				USkeletalMeshComponent* FPSMesh = SpawnWeaponActor->GetFPSEquipmentMesh();
+				FName FPSAttachSocket = AttachmentFragment->AttachInfo.AttachSocketFPS;
+				FPSMesh->AttachToComponent(PlayerCharacter->GetFPSArmComponent(), AttachmentTransformRules, FPSAttachSocket);
+				FPSMesh->SetRelativeTransform(AttachmentFragment->AttachInfo.AttachRelativeTransformFPS);
+
+				USkeletalMeshComponent* FPSArmMesh = PlayerCharacter->GetFPSArmComponent();
+				FPSArmMesh->SetRelativeTransform(AttachmentFragment->AttachInfo.AttachRelativeTransformFPSArm);
+			}
 		}
 	}
 }

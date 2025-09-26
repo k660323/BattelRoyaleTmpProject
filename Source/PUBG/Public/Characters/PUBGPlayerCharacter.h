@@ -38,6 +38,39 @@ public:
 
 	void SetProneSpringArm(bool IsOn);
 
+	void SetFPSMode(bool IsOn);
+
+	bool IsFPSMode();
+
+public:
+	FORCEINLINE USpringArmComponent* GetFPSSpringArmComponent() const
+	{
+		return FPSSpringArmComponent;
+	}
+
+	FORCEINLINE UCameraComponent* GetFPSCameraComponent() const
+	{
+		return FPSCamera;
+	}
+
+	FORCEINLINE USkeletalMeshComponent* GetFPSArmComponent() const
+	{
+		return FPSArm;
+	}
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	USpringArmComponent* FPSSpringArmComponent;
+
+	UPROPERTY(EditDefaultsOnly)
+	UCameraComponent* FPSCamera;
+
+	UPROPERTY(EditDefaultsOnly)
+	USkeletalMeshComponent* FPSArm;
+
+	UPROPERTY()
+	bool bIsFPSMode;
+
 protected:
 	virtual void OnRep_Owner() override;
 	virtual void OnRep_PlayerState() override;

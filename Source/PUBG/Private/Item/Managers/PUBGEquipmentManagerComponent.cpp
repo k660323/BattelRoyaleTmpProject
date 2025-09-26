@@ -148,7 +148,7 @@ void FPUBGEquipmentEntry::Equipment()
 					FTransform NewTransform = MeshComponent->GetSocketTransform(AttachSocket);
 					NewWeaponActor->SetActorTransform(NewTransform);
 					NewWeaponActor->AttachToComponent(MeshComponent, AttachmentTransformRules, AttachSocket);
-					NewWeaponActor->SetActorRelativeTransform(AttachInfo.AttachTransformOffset);
+					NewWeaponActor->SetActorRelativeTransform(AttachInfo.AttachRelativeTransform);
 				}
 				// 활성화된 무기가 존재시
 				// 소켓에 맞게 몸에 부착
@@ -714,26 +714,34 @@ void UPUBGEquipmentManagerComponent::SetWeaponActiveEquipmentSocketToWeaponEquip
 		SpawnWeaponActor->SetActorTransform(MeshComponent->GetSocketTransform(SocketName));
 		FAttachmentTransformRules AttachmentTransformRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, EAttachmentRule::KeepRelative, true);
 		SpawnWeaponActor->AttachToComponent(MeshComponent, AttachmentTransformRules, SocketName);
+
+		SpawnWeaponActor->GetFPSEquipmentMesh()->SetVisibility(false);
 	}
 }
 
 FName UPUBGEquipmentManagerComponent::GetWeaponEquipmentAttachSocket(EEquipmentSlotType EquipmentSlotType) const
 {
 	FName SocketName = NAME_None;
-
-	UPUBGAbilitySystemComponent* ASC = GetPUBGAbilitySystemComponent();
+	bool Result = false;
 
 	switch (EquipmentSlotType)
 	{
 	case EEquipmentSlotType::Main:
 	{
-		bool Result = ASC->HasMatchingGameplayTag(PUBGGameplayTags::Equip_Backpack);
+		if (UPUBGAbilitySystemComponent* ASC = GetPUBGAbilitySystemComponent())
+		{
+			Result = ASC->HasMatchingGameplayTag(PUBGGameplayTags::Equip_Backpack);
+		}
+
 		SocketName = (Result) ? FName(TEXT("Socket_BackLeft_Backpack")) : FName(TEXT("Socket_BackLeft_Normal"));
 		break;
 	}
 	case EEquipmentSlotType::Main2:
 	{
-		bool Result = ASC->HasMatchingGameplayTag(PUBGGameplayTags::Equip_Backpack);
+		if (UPUBGAbilitySystemComponent* ASC = GetPUBGAbilitySystemComponent())
+		{
+			Result = ASC->HasMatchingGameplayTag(PUBGGameplayTags::Equip_Backpack);
+		}
 		SocketName = (Result) ? FName(TEXT("Socket_BackRight_Backpack")) : FName(TEXT("Socket_BackRight_Normal"));
 		break;
 	}

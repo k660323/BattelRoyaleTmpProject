@@ -12,7 +12,7 @@
 UPUBGPlayerGA_Walk::UPUBGPlayerGA_Walk(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	ActivationPolicy = EPUBGAbilityActivationPolicy::OnHold;
+	ActivationPolicy = EPUBGAbilityActivationPolicy::OnTriggered;
 }
 
 void UPUBGPlayerGA_Walk::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

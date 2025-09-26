@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "System/PUBGAssetManager.h"
+#include "Item/Managers/PUBGActiveEquipmentManagerComponent.h"
 #include "PUBGGameplayTags.h"
 
 APUBGPlayerCharacter::APUBGPlayerCharacter(const FObjectInitializer& ObjectInitializer)
@@ -22,6 +23,7 @@ APUBGPlayerCharacter::APUBGPlayerCharacter(const FObjectInitializer& ObjectIniti
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
 
+	// 3인칭 컴포넌트
 	// 카메라 설정 ------------------------
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComponent->SetupAttachment(RootComponent);
@@ -30,18 +32,36 @@ APUBGPlayerCharacter::APUBGPlayerCharacter(const FObjectInitializer& ObjectIniti
 	// 부드럽게 회전
 	SpringArmComponent->bEnableCameraLag = true;
 	SpringArmComponent->CameraLagSpeed = 10.f;
-
 	// 컨트롤러 회전값을 반영한다.
 	SpringArmComponent->bUsePawnControlRotation = true;
 
 	TPSCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TPSCameraComponent"));
-
 	TPSCameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 	// 컨트롤러의 회전을 반영하지 않는다.
 	TPSCameraComponent->bUsePawnControlRotation = false;
 	// ------------------------------------
 
-	// 
+	// 1인칭 컴포넌트
+	FPSSpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("FPSSpringArmComponent"));
+	FPSSpringArmComponent->SetupAttachment(RootComponent);
+	FPSSpringArmComponent->TargetArmLength = 0.f;
+	FPSSpringArmComponent->SetRelativeLocation(FVector(0.f, 0.f, 75.f));
+	// 부드럽게 회전
+	FPSSpringArmComponent->bEnableCameraLag = true;
+	FPSSpringArmComponent->CameraLagSpeed = 10.f;
+	// 컨트롤러 회전값을 반영한다.
+	FPSSpringArmComponent->bUsePawnControlRotation = true;
+
+	FPSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCameraComponent"));
+	FPSCamera->SetupAttachment(FPSSpringArmComponent);
+	FPSCamera->bUsePawnControlRotation = false;
+	FPSArm = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPSArmComponent"));
+	FPSArm->SetupAttachment(FPSCamera);
+	FPSArm->SetRelativeLocationAndRotation(FVector(-11.0f, 0.36f, -165.5f), FRotator(0.0f, -90.0f, 0.0f));
+	FPSArm->SetOnlyOwnerSee(true);
+	FPSArm->SetVisibility(false);
+	// ------------------------------------
+
 	// 컨트롤러 회전값에 따라 회전
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	// 입력 방향 기준으로 회전x
@@ -206,11 +226,40 @@ void APUBGPlayerCharacter::SetProneSpringArm(bool IsOn)
 	if (IsOn)
 	{
 		SpringArmComponent->SetRelativeLocation(FVector(0.f, 25.f, 0.f));
+		FPSSpringArmComponent->SetRelativeLocation(FVector(50.5f, 3.675f, -65.0f));
 	}
 	else
 	{
 		SpringArmComponent->SetRelativeLocation(FVector(0.f, 25.f, 100.f));
+		FPSSpringArmComponent->SetRelativeLocation(FVector(0.f, 0.f, 75.0f));
 	}
+}
+
+void APUBGPlayerCharacter::SetFPSMode(bool IsOn)
+{
+	bIsFPSMode = IsOn;
+
+	PUBGActiveEquipmentManagerComponent->RefreshCurActiveEuipmentAttachSocket();
+
+	if (IsOn)
+	{
+		FPSArm->SetVisibility(true, true);
+		FPSCamera->SetVisibility(true);
+		GetMesh()->SetVisibility(false, true);
+		TPSCameraComponent->SetActive(false);
+	}
+	else
+	{
+		FPSArm->SetVisibility(false, true);
+		FPSCamera->SetVisibility(false);
+		GetMesh()->SetVisibility(true, true);
+		TPSCameraComponent->SetActive(true);
+	}
+}
+
+bool APUBGPlayerCharacter::IsFPSMode()
+{
+	return bIsFPSMode;
 }
 
 // 서버에서 빙의(Owner 변경)시 클라이언트에서 호출

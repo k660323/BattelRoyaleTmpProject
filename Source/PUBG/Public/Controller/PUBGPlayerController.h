@@ -11,6 +11,8 @@ class APUBGPlayerState;
 class UCurveFloat;
 class UTimelineComponent;
 class UPUBGItemManagerComponent;
+class UCameraSpringArmTimelineComponent;
+class UCameraMode;
 
 struct FInputActionValue;
 /**
@@ -35,10 +37,14 @@ protected:
 	void Input_Turn(const FInputActionValue& InputActionValue);
 	void Input_FreeViewStarted(const FInputActionValue& InputActionValue);
 	void Input_FreeViewReleased(const FInputActionValue& InputActionValue);
-
+	
 	void Input_AbilityInputStarted(FGameplayTag InInputTag);
 	void Input_AbilityInputPressed(FGameplayTag InInputTag);
 	void Input_AbilityInputReleased(FGameplayTag InInputTag);
+
+protected:
+	UFUNCTION()
+	void FreeViewTimelineEnd();
 
 public:
 	virtual void PostProcessInput(const float DeltaTime, const bool bGamePaused);
@@ -47,27 +53,27 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "LimitPitch")
 	bool LimitPitchAngle(const float Axis);
-private:
-	UFUNCTION()
-	void UpdateReleaseFreeView(float DeltaTime);
-	UFUNCTION()
-	void EndReleaseFreeView();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FRotator GetPressedRotator();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FRotator GetReleaseRotator();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemManager")
 	TObjectPtr<UPUBGItemManagerComponent> ItemManagerComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemManager")
+	TObjectPtr<UCameraSpringArmTimelineComponent> CameraSpringArmTimelineComponent;
 
 private:
 	bool IsFreeViewMove;
 
+	UPROPERTY(EditDefaultsOnly, Category = "AllowPrivateAccess")
+	TSubclassOf<UCameraMode> FreeViewMode;
+
 	FRotator CachedPressedRotator;
 	FRotator CachedReleaseRotator;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FreeViewTimeline", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UTimelineComponent> FreeViewTimeline;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FreeViewTimeline", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UCurveFloat> FreeViewCurve;
 
 	// Yaw 경계값 지정
 	float BottomValue;

@@ -44,15 +44,15 @@ void UPUBGAnimNotifyState_PerfomTrace::NotifyBegin(USkeletalMeshComponent* MeshC
 			if (TraceParams.bCharacterMeshSocket)
 			{
 				FTransform SocketTransform = MeshComponent->GetSocketTransform(TraceParams.TraceSocketName);
-				PreviousTraceTransform = WeaponActor->GetEquipmentMesh()->GetRelativeTransform() * SocketTransform;
+				PreviousTraceTransform = WeaponActor->GetTPSEquipmentMesh()->GetRelativeTransform() * SocketTransform;
 				PreviousDebugTransform = WeaponActor->GetTraceDebugCollision()->GetRelativeTransform() * SocketTransform;
 				PreviousSocketTransform = SocketTransform;
 			}
 			else
 			{
-				PreviousTraceTransform = WeaponActor->GetEquipmentMesh()->GetComponentTransform();
+				PreviousTraceTransform = WeaponActor->GetTPSEquipmentMesh()->GetComponentTransform();
 				PreviousDebugTransform = WeaponActor->GetTraceDebugCollision()->GetComponentTransform();
-				PreviousSocketTransform = WeaponActor->GetEquipmentMesh()->GetSocketTransform(TraceParams.TraceSocketName);
+				PreviousSocketTransform = WeaponActor->GetTPSEquipmentMesh()->GetSocketTransform(TraceParams.TraceSocketName);
 			}
 
 			
@@ -64,7 +64,7 @@ void UPUBGAnimNotifyState_PerfomTrace::NotifyBegin(USkeletalMeshComponent* MeshC
 			}
 			else
 			{
-				check(WeaponActor->GetEquipmentMesh()->DoesSocketExist(TraceParams.TraceSocketName));
+				check(WeaponActor->GetTPSEquipmentMesh()->DoesSocketExist(TraceParams.TraceSocketName));
 			}
 #endif
 
@@ -101,7 +101,7 @@ void UPUBGAnimNotifyState_PerfomTrace::NotifyEnd(USkeletalMeshComponent* MeshCom
 
 void UPUBGAnimNotifyState_PerfomTrace::PerformTrace(USkeletalMeshComponent* MeshComponent)
 {
-	FTransform CurrentSocketTransform = TraceParams.bCharacterMeshSocket ? MeshComponent->GetSocketTransform(TraceParams.TraceSocketName) : WeaponActor->GetEquipmentMesh()->GetSocketTransform(TraceParams.TraceSocketName);
+	FTransform CurrentSocketTransform = TraceParams.bCharacterMeshSocket ? MeshComponent->GetSocketTransform(TraceParams.TraceSocketName) : WeaponActor->GetTPSEquipmentMesh()->GetSocketTransform(TraceParams.TraceSocketName);
 	float Distance = (PreviousSocketTransform.GetLocation() - CurrentSocketTransform.GetLocation()).Length();
 
 	int SubStepCount = FMath::CeilToInt(Distance / TraceParams.TargetDistance);
@@ -116,12 +116,12 @@ void UPUBGAnimNotifyState_PerfomTrace::PerformTrace(USkeletalMeshComponent* Mesh
 	if (TraceParams.bCharacterMeshSocket)
 	{
 		FTransform SocketTransform = MeshComponent->GetSocketTransform(TraceParams.TraceSocketName);
-		CurrentTraceTransform = WeaponActor->GetEquipmentMesh()->GetRelativeTransform() * SocketTransform;
+		CurrentTraceTransform = WeaponActor->GetTPSEquipmentMesh()->GetRelativeTransform() * SocketTransform;
 		CurrentDebugTransform = WeaponActor->GetTraceDebugCollision()->GetRelativeTransform() * SocketTransform;
 	}
 	else
 	{
-		CurrentTraceTransform = WeaponActor->GetEquipmentMesh()->GetComponentTransform();
+		CurrentTraceTransform = WeaponActor->GetTPSEquipmentMesh()->GetComponentTransform();
 		CurrentDebugTransform = WeaponActor->GetTraceDebugCollision()->GetComponentTransform();
 	}
 
@@ -141,7 +141,7 @@ void UPUBGAnimNotifyState_PerfomTrace::PerformTrace(USkeletalMeshComponent* Mesh
 		Params.AddIgnoredActors(IgnoredActors);
 
 		TArray<FHitResult> HitResults;
-		MeshComponent->GetWorld()->ComponentSweepMulti(HitResults, WeaponActor->GetEquipmentMesh(), StartTraceTransform.GetLocation(), EndTraceTransform.GetLocation(), AverageTraceTransform.GetRotation(), Params);
+		MeshComponent->GetWorld()->ComponentSweepMulti(HitResults, WeaponActor->GetTPSEquipmentMesh(), StartTraceTransform.GetLocation(), EndTraceTransform.GetLocation(), AverageTraceTransform.GetRotation(), Params);
 
 		for (const FHitResult& HitResult : HitResults)
 		{

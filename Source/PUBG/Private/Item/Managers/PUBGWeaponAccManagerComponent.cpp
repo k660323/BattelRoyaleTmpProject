@@ -129,7 +129,7 @@ void FPUBGWeaponAccEntry::Equip()
 					if (LoadedStaticMesh)
 					{
 						WeaponAccMesh = NewObject<UStaticMeshComponent>(EquipmentActor, *(FString::Printf(TEXT("SKM_")) + StaticEnum<EGunAccType>()->GetValueAsString(WeaponAccType)));
-						WeaponAccMesh->SetupAttachment(EquipmentActor->GetEquipmentMesh()); // 부모 설정, 로컬 좌표 (0,0,0) snaptotarget
+						WeaponAccMesh->SetupAttachment(EquipmentActor->GetTPSEquipmentMesh()); // 부모 설정, 로컬 좌표 (0,0,0) snaptotarget
 						WeaponAccMesh->SetCollisionProfileName(TEXT("NoCollision"));
 						WeaponAccMesh->SetStaticMesh(LoadedStaticMesh);
 						WeaponAccMesh->bWantsInitializeComponent = true;
@@ -142,7 +142,7 @@ void FPUBGWeaponAccEntry::Equip()
 							true
 						);
 
-						WeaponAccMesh->AttachToComponent(EquipmentActor->GetEquipmentMesh(), TransformRules, GunFragment->AttachSocket);
+						WeaponAccMesh->AttachToComponent(EquipmentActor->GetTPSEquipmentMesh(), TransformRules, GunFragment->AttachSocket);
 					}
 				}
 			}

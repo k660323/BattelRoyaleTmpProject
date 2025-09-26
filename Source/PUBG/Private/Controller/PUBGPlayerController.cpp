@@ -15,6 +15,7 @@
 #include "Components/TimelineComponent.h"
 #include "Input/PUBGEnhancedPlayerInput.h"
 #include "Item/Managers/PUBGItemManagerComponent.h"
+#include "Camera/CameraSpringArmTimelineComponent.h"
 #include "PUBG.h"
 
 // TMP
@@ -33,16 +34,11 @@ APUBGPlayerController::APUBGPlayerController(const FObjectInitializer& ObjectIni
 	, IsFreeViewMove(false)
 	, CachedPressedRotator(FRotator::ZeroRotator)
 	, CachedReleaseRotator(FRotator::ZeroRotator)
-	, FreeViewTimeline(nullptr)
-	, FreeViewCurve(nullptr)
 	, BottomValue(290.f)
 	, TopValue(75.f)
 {
 	ItemManagerComponent = CreateDefaultSubobject<UPUBGItemManagerComponent>(TEXT("ItemManagerComponent"));
-
-#if WITH_CLIENT_CODE || WITH_EDITOR
-	FreeViewTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("FreeViewTimeline"));
-#endif
+	CameraSpringArmTimelineComponent = CreateDefaultSubobject<UCameraSpringArmTimelineComponent>(TEXT("CameraSpringArmTimelineComponent"));
 }
 
 // 인풋 클래스 변경
@@ -84,18 +80,6 @@ void APUBGPlayerController::SetupInputComponent()
 	}
 
 	PUBG_LOG(LogPUBGNetwork, Log, TEXT("Call SetupInputComponent"));
-
-	if (UCurveFloat* CurveFloat = UPUBGAssetManager::Get().GetAssetByName<UCurveFloat>("ReleaseFreeView"))
-	{
-		FreeViewCurve = CurveFloat;
-		FOnTimelineFloat ProgressUpdate;
-		ProgressUpdate.BindDynamic(this, &ThisClass::UpdateReleaseFreeView);
-		FreeViewTimeline->AddInterpFloat(FreeViewCurve, ProgressUpdate);
-		FreeViewTimeline->SetLooping(false);
-		FOnTimelineEvent EndEvent;
-		EndEvent.BindDynamic(this, &ThisClass::EndReleaseFreeView);
-		FreeViewTimeline->SetTimelineFinishedFunc(EndEvent);
-	}
 }
 
 
@@ -153,6 +137,7 @@ void APUBGPlayerController::Input_Turn(const FInputActionValue& InputActionValue
 
 void APUBGPlayerController::Input_FreeViewStarted(const FInputActionValue& InputActionValue)
 {
+	// TODO : ASC 태그로 처리
 	if (IsFreeViewMove)
 	{
 		return;
@@ -185,7 +170,8 @@ void APUBGPlayerController::Input_FreeViewReleased(const FInputActionValue& Inpu
 	}
 
 	CachedReleaseRotator = GetControlRotation();
-	FreeViewTimeline->PlayFromStart();
+	CameraSpringArmTimelineComponent->EndDelegate.AddDynamic(this, &ThisClass::FreeViewTimelineEnd);
+	CameraSpringArmTimelineComponent->PlayTimeline(FreeViewMode, 0);
 }
 
 void APUBGPlayerController::Input_AbilityInputStarted(FGameplayTag InInputTag)
@@ -233,6 +219,16 @@ void APUBGPlayerController::Input_AbilityInputReleased(FGameplayTag InInputTag)
 		{
 			ASC->OnAbilityTagReleased(InInputTag);
 		}
+	}
+}
+
+void APUBGPlayerController::FreeViewTimelineEnd()
+{
+	IsFreeViewMove = false;
+
+	if (APUBGPlayerCharacter* PlayerCharacter = Cast<APUBGPlayerCharacter>(GetCharacter()))
+	{
+		PlayerCharacter->SetCameraFreeViewMode(false);
 	}
 }
 
@@ -296,19 +292,14 @@ bool APUBGPlayerController::LimitPitchAngle(const float Axis)
 	return (pitch > BottomValue || pitch < TopValue);
 }
 
-void APUBGPlayerController::UpdateReleaseFreeView(float DeltaTime)
+FRotator APUBGPlayerController::GetPressedRotator()
 {
-	FRotator Rotator = FMath::Lerp(CachedReleaseRotator, CachedPressedRotator, DeltaTime);
-	SetControlRotation(Rotator);
+	return CachedPressedRotator;
 }
 
-void APUBGPlayerController::EndReleaseFreeView()
+FRotator APUBGPlayerController::GetReleaseRotator()
 {
-	if (APUBGPlayerCharacter* PlayerCharacter = Cast<APUBGPlayerCharacter>(GetCharacter()))
-	{
-		PlayerCharacter->SetCameraFreeViewMode(false);
-	}
-	IsFreeViewMove = false;
+	return CachedReleaseRotator;
 }
 
 void APUBGPlayerController::TestEquipAccInventoryFirstItem()

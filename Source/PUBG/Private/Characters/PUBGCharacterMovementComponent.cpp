@@ -159,7 +159,7 @@ float UPUBGCharacterMovementComponent::GetMaxSpeed() const
 				}
 
 				bool IsProne = ASC->HasMatchingGameplayTag(PUBGGameplayTags::Status_Prone);
-				bool IsAim = ASC->HasMatchingGameplayTag(PUBGGameplayTags::Status_Aim);
+				bool IsAim = ASC->HasMatchingGameplayTag(PUBGGameplayTags::Status_Aiming);
 				bool IsDrink = ASC->HasMatchingGameplayTag(PUBGGameplayTags::Status_Drink);
 				bool IsSprint = ASC->HasMatchingGameplayTag(PUBGGameplayTags::Status_Sprint);
 				bool IsWalk = ASC->HasMatchingGameplayTag(PUBGGameplayTags::Status_Walk);

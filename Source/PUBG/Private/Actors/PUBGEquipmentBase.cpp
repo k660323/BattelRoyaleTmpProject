@@ -29,20 +29,30 @@ APUBGEquipmentBase::APUBGEquipmentBase(const FObjectInitializer& ObjectInitializ
 	ArrowComponent->PrimaryComponentTick.bStartWithTickEnabled = false;
 	SetRootComponent(ArrowComponent);
 
-	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
-	SkeletalMeshComponent->SetCollisionProfileName("Weapon");
-	SkeletalMeshComponent->SetGenerateOverlapEvents(false);
-	SkeletalMeshComponent->SetupAttachment(GetRootComponent());
-	SkeletalMeshComponent->PrimaryComponentTick.bStartWithTickEnabled = false;
-	SkeletalMeshComponent->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
-	SkeletalMeshComponent->SetupAttachment(RootComponent);
+	TPSMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TP_WeaponMesh"));
+	TPSMesh->SetCollisionProfileName("Weapon");
+	TPSMesh->SetGenerateOverlapEvents(false);
+	TPSMesh->SetupAttachment(GetRootComponent());
+	TPSMesh->PrimaryComponentTick.bStartWithTickEnabled = false;
+	TPSMesh->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+	TPSMesh->SetupAttachment(RootComponent);
+
+	FPS_Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPS_WeaponMesh"));
+	FPS_Mesh->SetCollisionProfileName("NoCollision");
+	FPS_Mesh->SetGenerateOverlapEvents(false);
+	FPS_Mesh->SetupAttachment(GetRootComponent());
+	FPS_Mesh->PrimaryComponentTick.bStartWithTickEnabled = false;
+	FPS_Mesh->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+	FPS_Mesh->SetOnlyOwnerSee(true);
+	FPS_Mesh->SetVisibility(false);
+	FPS_Mesh->SetupAttachment(RootComponent);
 
 	TraceDebugCollision = CreateDefaultSubobject<UBoxComponent>("TraceDebugCollision");
 	TraceDebugCollision->SetCollisionProfileName("NoCollision");
 	TraceDebugCollision->SetGenerateOverlapEvents(false);
 	TraceDebugCollision->SetupAttachment(GetRootComponent());
 	TraceDebugCollision->PrimaryComponentTick.bStartWithTickEnabled = false;
-
+	
 	CreateDefaultSubobject<UPUBGWeaponAccManagerComponent>("WeaponAccManager");
 }
 
@@ -171,9 +181,14 @@ EWeaponClassType APUBGEquipmentBase::GetWeaponClassType() const
 	return WeaponClassType;
 }
 
-USkeletalMeshComponent* APUBGEquipmentBase::GetEquipmentMesh() const
+USkeletalMeshComponent* APUBGEquipmentBase::GetTPSEquipmentMesh() const
 {
-	return SkeletalMeshComponent;
+	return TPSMesh;
+}
+
+USkeletalMeshComponent* APUBGEquipmentBase::GetFPSEquipmentMesh() const
+{
+	return FPS_Mesh;
 }
 
 UBoxComponent* APUBGEquipmentBase::GetTraceDebugCollision() const

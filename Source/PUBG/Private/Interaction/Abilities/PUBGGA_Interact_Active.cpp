@@ -26,6 +26,7 @@ UPUBGGA_Interact_Active::UPUBGGA_Interact_Active(const FObjectInitializer& Objec
 	AbilityTags.AddTag(PUBGGameplayTags::Ability_Interact_Active);
 	ActivationOwnedTags.AddTag(PUBGGameplayTags::Status_Interact);
 
+	if(HasAnyFlags(RF_ClassDefaultObject))
 	{
 		FAbilityTriggerData TirggerData;
 		TirggerData.TriggerTag = PUBGGameplayTags::Ability_Interact_Active;

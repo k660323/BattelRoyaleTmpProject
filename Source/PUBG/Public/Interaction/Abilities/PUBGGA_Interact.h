@@ -3,6 +3,7 @@
 #pragma once
 
 #include "AbilitySystem/Abilities/PUBGGameplayAbility.h"
+#include "Interaction/PUBGInteractionInfo.h"
 #include "PUBGGA_Interact.generated.h"
 
 USTRUCT(BlueprintType)

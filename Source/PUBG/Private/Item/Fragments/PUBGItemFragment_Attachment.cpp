@@ -13,6 +13,7 @@ UPUBGItemFragment_Attachment::UPUBGItemFragment_Attachment(const FObjectInitiali
 	AttachInfo.AttachSocketMap.Add({ PUBGGameplayTags::Status_Stand, NAME_None });
 	AttachInfo.AttachSocketMap.Add({ PUBGGameplayTags::Status_Crouch, NAME_None });
 	AttachInfo.AttachSocketMap.Add({ PUBGGameplayTags::Status_Prone, NAME_None });
+	AttachInfo.AttachSocketMap.Add({ PUBGGameplayTags::Status_Aiming, NAME_None });
 
 
 	EquipMontageMap.Add({ PUBGGameplayTags::Status_Stand, nullptr });
@@ -33,7 +34,11 @@ FName UPUBGItemFragment_Attachment::GetActiveEquipmentAttachSocket(UPUBGAbilityS
 		return AttachSocket;
 	}
 
-	if (ASC->HasMatchingGameplayTag(PUBGGameplayTags::Status_Crouch))
+	if (ASC->HasMatchingGameplayTag(PUBGGameplayTags::Status_Aiming))
+	{
+		AttachSocket = AttachInfo.AttachSocketMap[PUBGGameplayTags::Status_Aiming];
+	}
+	else if (ASC->HasMatchingGameplayTag(PUBGGameplayTags::Status_Crouch))
 	{
 		AttachSocket = AttachInfo.AttachSocketMap[PUBGGameplayTags::Status_Crouch];
 	}

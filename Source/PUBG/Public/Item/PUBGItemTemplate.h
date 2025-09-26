@@ -3,6 +3,7 @@
 #pragma once
 
 #include "UObject/NoExportTypes.h"
+#include "GameplayTagContainer.h"
 #include "PUBGItemTemplate.generated.h"
 
 class UPUBGItemInstance;

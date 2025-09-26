@@ -50,7 +50,8 @@ public:
 
 	EWeaponClassType GetWeaponClassType() const;
 
-	USkeletalMeshComponent* GetEquipmentMesh() const;
+	USkeletalMeshComponent* GetTPSEquipmentMesh() const;
+	USkeletalMeshComponent* GetFPSEquipmentMesh() const;
 
 	UBoxComponent* GetTraceDebugCollision() const;
 
@@ -63,7 +64,10 @@ protected:
 	TObjectPtr<UArrowComponent> ArrowComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
+	TObjectPtr<USkeletalMeshComponent> TPSMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<USkeletalMeshComponent> FPS_Mesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UBoxComponent> TraceDebugCollision;

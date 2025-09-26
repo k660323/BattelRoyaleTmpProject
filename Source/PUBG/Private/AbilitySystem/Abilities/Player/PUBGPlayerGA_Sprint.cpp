@@ -16,7 +16,7 @@ UPUBGPlayerGA_Sprint::UPUBGPlayerGA_Sprint(const FObjectInitializer& ObjectIniti
 	: Super(ObjectInitializer)
 {
 	// bServerRespectsRemoteAbilityCancellation = false;
-	ActivationPolicy = EPUBGAbilityActivationPolicy::OnHold;
+	ActivationPolicy = EPUBGAbilityActivationPolicy::OnTriggered;
 	AbilityTags.AddTag(PUBGGameplayTags::Ability_Sprint_Active);
 	ActivationOwnedTags.AddTag(PUBGGameplayTags::Status_Sprint);
 
@@ -65,12 +65,6 @@ void UPUBGPlayerGA_Sprint::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 			CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
 			return;
 		}
-
-		if (UAbilityTask_WaitInputRelease* WaitInputRelease = UAbilityTask_WaitInputRelease::WaitInputRelease(this))
-		{
-			WaitInputRelease->OnRelease.AddDynamic(this, &ThisClass::OnReInputRelease);
-			WaitInputRelease->ReadyForActivation();
-		}
 	}
 	else if(HasAuthority(&CurrentActivationInfo))
 	{
@@ -89,6 +83,12 @@ void UPUBGPlayerGA_Sprint::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	{
 		TickTask->OnTick.AddDynamic(this, &ThisClass::OnTick);
 		TickTask->ReadyForActivation();
+	}
+
+	if (UAbilityTask_WaitInputRelease* WaitInputRelease = UAbilityTask_WaitInputRelease::WaitInputRelease(this))
+	{
+		WaitInputRelease->OnRelease.AddDynamic(this, &ThisClass::OnReInputRelease);
+		WaitInputRelease->ReadyForActivation();
 	}
 
 	// GetWorld()->GetTimerManager().SetTimer(SprintTimerHandle, this, &ThisClass::OnSprintCommitTick, CommitInterval, true);

@@ -2,33 +2,26 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "AbilitySystem/Abilities/PUBGPlayerGameplayAbility.h"
-#include "PUBGPlayerGA_Jump.generated.h"
+#include "AbilitySystem/Abilities/PUBGGameplayAbility.h"
+#include "PUBGGA_FPS.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PUBG_API UPUBGPlayerGA_Jump : public UPUBGPlayerGameplayAbility
+class PUBG_API UPUBGGA_FPS : public UPUBGGameplayAbility
 {
 	GENERATED_BODY()
 	
 public:
-	UPUBGPlayerGA_Jump(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UPUBGGA_FPS(const FObjectInitializer& ObjectInitalizer = FObjectInitializer::Get());
 
 protected:
+	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const override;
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
-protected:
-	UFUNCTION(Server, Reliable)
-	void Server_RequestJump();
-
-protected:
+private:
 	UFUNCTION()
-	void StartJump();
-
-	UFUNCTION()
-	void OnLandedCallback(const FHitResult& Hit);
+	void OnPressed(float TimeWaited);
 };
